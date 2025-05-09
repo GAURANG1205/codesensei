@@ -1,0 +1,2 @@
+D:/Android/StudioProjects/CodeSensei/Fontend/codesensei/android/app/.cxx/Debug/404x2i52/x86_64/CMakeFiles/edit_cache.dir
+D:/Android/StudioProjects/CodeSensei/Fontend/codesensei/android/app/.cxx/Debug/404x2i52/x86_64/CMakeFiles/rebuild_cache.dir
