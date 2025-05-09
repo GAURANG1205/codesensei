@@ -260,7 +260,7 @@ class _CodePasteScreenState extends State<CodePasteScreen> {
                     ),
                     const SizedBox(height: 16),
                     if (isLoading)
-                      const Center(child: CircularProgressIndicator())
+                      const Center(child: CircularProgressIndicator(color: primaryColor,))
                     else if (aiSummary != null)
                       Text(
                         aiSummary!,

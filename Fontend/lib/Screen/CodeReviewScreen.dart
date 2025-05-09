@@ -28,26 +28,28 @@ class _CodeScreenState extends State<CodeReviewScreen> {
   bool _isLoading = true;
   String _error = '';
   int rating = 1;
-  Future<List<Map<String, dynamic>>> fetchAiReview(String code) async {
+  Future<void> fetchAiReview(String code) async {
     final response = await http.post(
-      Uri.parse('http://192.168.0.115:8080/api/review/code_review'), // Use your actual IP/port
+      Uri.parse('http://192.168.0.115:8080/api/review/code_review'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'code': code}),
     );
 
     if (response.statusCode == 200) {
-      return List<Map<String, dynamic>>.from(jsonDecode(response.body));
+      final data = jsonDecode(response.body);
+      setState(() {
+        _suggestions = List<Map<String, dynamic>>.from(data['suggestions']);
+        rating = data['rating'] ?? 1;
+        _isLoading = false;
+      });
     } else {
       throw Exception('Failed to fetch review');
     }
   }
+
   void _loadSuggestions() async {
     try {
-      final suggestions = await fetchAiReview(widget.initialCode);
-      setState(() {
-        _suggestions = suggestions;
-        _isLoading = false;
-      });
+      await fetchAiReview(widget.initialCode);
     } catch (e) {
       setState(() {
         _error = e.toString();
@@ -55,6 +57,7 @@ class _CodeScreenState extends State<CodeReviewScreen> {
       });
     }
   }
+
   @override
   void initState() {
     super.initState();
@@ -167,9 +170,9 @@ class _CodeScreenState extends State<CodeReviewScreen> {
               ),
               SizedBox(height: 10),
               SizedBox(
-                height: 350,
+                height: 300,
                 child: _isLoading
-                    ? Center(child: CircularProgressIndicator())
+                    ? Center(child: CircularProgressIndicator(color: primaryColor,))
                     : _error.isNotEmpty
                     ? Center(child: Text("Error loading suggestions: $_error", style: TextStyle(color: Colors.red)))
                     : _suggestions.isEmpty
@@ -186,7 +189,7 @@ class _CodeScreenState extends State<CodeReviewScreen> {
                 children: [
                   Text(
                     "AI Code Rating: ",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   ...List.generate(5, (index) {
                     return Icon(

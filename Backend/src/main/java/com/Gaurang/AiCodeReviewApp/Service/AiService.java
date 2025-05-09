@@ -42,11 +42,18 @@ public class AiService {
 
         return "All AI APIs failed.";
     }
-    public List<Map<String, String>> generateReview(String code) {
-        String prompt = "Review the following code and provide issues and fixes Only in the following format:\n" +
-                "Type: <Error or Suggestion Only>\nMessage: <explanation>\nFix: <fix>\n---\nCode:\n" + code;
+    public Map<String, Object> generateReview(String code) {
+        String prompt = "Review the following code and provide issues and fixes in the following format:\n" +
+                "Type: <Error or Suggestion Only>\n" +
+                "Message: <explanation>\n" +
+                "Fix: <fix>\n" +
+                "---\n" +
+                "At the end, give an overall rating from 1 to 5 in the format:\n" +
+                "Rating: <number from 1 to 5>\n" +
+                "Code:\n" + code;
 
         String rawResponse = null;
+
         try {
             rawResponse = geminiService.getSummary(prompt);
         } catch (Exception e) {
@@ -70,10 +77,30 @@ public class AiService {
         }
 
         if (rawResponse == null) {
-            return List.of(Map.of("type", "Error", "message", "All AI services failed", "fix", "Please try again later"));
+            return Map.of(
+                    "suggestions", List.of(Map.of("type", "Error", "message", "All AI services failed", "fix", "Please try again later")),
+                    "rating", 0
+            );
         }
 
-        return parseResponse(rawResponse);
+        List<Map<String, String>> suggestions = parseResponse(rawResponse);
+        int rating = extractRating(rawResponse);
+
+        return Map.of(
+                "suggestions", suggestions,
+                "rating", rating
+        );
+    }
+    private int extractRating(String text) {
+        String marker = "Rating:";
+        int index = text.lastIndexOf(marker);
+        if (index == -1) return 0;
+        try {
+            String ratingStr = text.substring(index + marker.length()).trim().split("\\s+")[0];
+            return Integer.parseInt(ratingStr);
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     private List<Map<String, String>> parseResponse(String raw) {

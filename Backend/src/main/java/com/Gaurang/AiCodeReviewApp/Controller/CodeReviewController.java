@@ -20,9 +20,16 @@ public class CodeReviewController {
         return ResponseEntity.ok(aiService.generateSummary(request.getCode()));
     }
     @PostMapping("/code_review")
-    public List<Map<String, String>> reviewCode(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, Object>> reviewCode(@RequestBody Map<String, String> request) {
         String code = request.get("code");
-        return aiService.generateReview(code);
+        if (code == null || code.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "Code cannot be empty"
+            ));
+        }
+
+        Map<String, Object> result = aiService.generateReview(code);
+        return ResponseEntity.ok(result);
     }
 }
 
