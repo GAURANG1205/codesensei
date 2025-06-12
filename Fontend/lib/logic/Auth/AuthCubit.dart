@@ -32,8 +32,15 @@ class AuthCubit extends Cubit<AuthState> {
         await prefs.setString('username', username);
         print("Login successful. Token stored.");
         emit(AuthSuccess());
+      }
+        emit(AuthFailure("Login failed:"));
+      final errorMessage = response.body;
+      if (response.statusCode == 404 && errorMessage == "User not found") {
+        emit(AuthFailure("User not found"));
+      } else if (response.statusCode == 401 && errorMessage == "Invalid credentials") {
+        emit(AuthFailure("Incorrect password"));
       } else {
-        emit(AuthFailure("Login failed: ${response.body}"));
+        emit(AuthFailure("Something went wrong"));
       }
     } on TimeoutException catch (_) {
       emit(AuthFailure("Request timed out. Please try again."));
@@ -58,8 +65,11 @@ class AuthCubit extends Cubit<AuthState> {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final token = data['token'];
+        final username = data['username'];
         final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('username', username);
         await prefs.setString('authToken', token);
+
         emit(AuthSuccess());
       } else {
         emit(AuthFailure("Signup failed: ${response.body}"));
@@ -103,6 +113,7 @@ class AuthCubit extends Cubit<AuthState> {
         final token = response.body;
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('authToken', token);
+        await prefs.setString('username',name);
         emit(AuthSuccess());
         print("Login successful. Token stored.");
       } else {

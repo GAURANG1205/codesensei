@@ -36,7 +36,7 @@ class _CodePasteScreenState extends State<CodePasteScreen> {
     final code = _codeController.text.trim();
     if (code.isEmpty) {
       ScaffoldMessage.showSnackBar(context,
-          message: "Code is empty!", isError: true);
+          message: "Code is empty!", isError: true,);
       return;
     }
     setState(() => isLoading = true);
@@ -251,7 +251,7 @@ class _CodePasteScreenState extends State<CodePasteScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                     Text(
                       'AI Review Summary',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,

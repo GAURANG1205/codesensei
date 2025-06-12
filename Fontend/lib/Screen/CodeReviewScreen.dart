@@ -1,8 +1,11 @@
 import 'dart:convert';
 
 import 'package:code_text_field/code_text_field.dart';
+import 'package:codesensei/Common/CustomTextField.dart';
 import 'package:codesensei/Common/ScaffoldMessage.dart';
 import 'package:codesensei/Theme/colors.dart';
+import 'package:codesensei/router/app_router.dart';
+import 'package:codesensei/router/serviceLocator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -47,9 +50,9 @@ class _CodeScreenState extends State<CodeReviewScreen> {
     }
   }
 
-  void _loadSuggestions() async {
+  void _loadSuggestions(String code) async {
     try {
-      await fetchAiReview(widget.initialCode);
+      await fetchAiReview(code);
     } catch (e) {
       setState(() {
         _error = e.toString();
@@ -65,7 +68,7 @@ class _CodeScreenState extends State<CodeReviewScreen> {
       text: "${widget.initialCode}",
       language: dart,
     );
-    _loadSuggestions();
+    _loadSuggestions(_codeController.text);
   }
   @override
   void dispose() {
@@ -206,7 +209,13 @@ class _CodeScreenState extends State<CodeReviewScreen> {
                   ElevatedButton.icon(
                     style:
                         ElevatedButton.styleFrom(backgroundColor: primaryColor),
-                    onPressed: () {},
+                    onPressed: () {
+                      showModalBottomSheet(
+                        useSafeArea: true,
+                        context: context,
+                        builder: (ctx) => const SaveReviewBottomSheet(),
+                      );
+                    },
                     icon: Icon(
                       Icons.save_alt,
                       color: Colors.white,
@@ -219,7 +228,21 @@ class _CodeScreenState extends State<CodeReviewScreen> {
                   ElevatedButton.icon(
                     style:
                         ElevatedButton.styleFrom(backgroundColor: primaryColor),
-                    onPressed: () {},
+                    onPressed: ()  {
+                      String updatedCode = _codeController.text;
+                      for (var s in _suggestions) {
+                        final original = s["original"];
+                        final fix = s["fix"];
+                        if (original != null && fix != null && original != fix) {
+                          updatedCode = updatedCode.replaceAll(original, fix);
+                        }
+                      }
+                      setState(() {
+                        _codeController.text = updatedCode;
+                      });
+                       _loadSuggestions(_codeController.text);
+                      ScaffoldMessage.showSnackBar(context, message: "All fixes applied");
+                    },
                     icon: Icon(
                       Icons.build_circle_outlined,
                       color: Colors.white,
@@ -269,7 +292,17 @@ class _CodeScreenState extends State<CodeReviewScreen> {
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton.icon(
-                  onPressed: () {},
+                  onPressed: () async{
+                    final original = s["original"];
+                    if (original != null && fix != null && original != fix) {
+                      final updatedCode = _codeController.text.replaceFirst(original, fix);
+                      setState(() {
+                        _codeController.text = updatedCode;
+                      });
+                      _loadSuggestions(_codeController.text);
+                      ScaffoldMessage.showSnackBar(context, message: "Fix applied");
+                    }
+                  },
                   icon: Icon(Icons.build_circle_outlined, color: primaryColor),
                   label: Text("Apply Fix", style: TextStyle(color: primaryColor)),
                 ),
@@ -281,3 +314,97 @@ class _CodeScreenState extends State<CodeReviewScreen> {
     );
   }
 }
+class SaveReviewBottomSheet extends StatefulWidget {
+  const SaveReviewBottomSheet({super.key});
+
+  @override
+  State<SaveReviewBottomSheet> createState() => _SaveReviewBottomSheetState();
+}
+
+class _SaveReviewBottomSheetState extends State<SaveReviewBottomSheet> {
+  final TextEditingController _reviewNameController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body:
+       Padding(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 5,
+                margin: const EdgeInsets.only(bottom: 20),
+                decoration: BoxDecoration(
+                  color: Colors.grey[700],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+            Text("Save Code Review", style: Theme.of(context).textTheme.titleLarge),
+            const SizedBox(height: 18),
+            CustomTextField(
+              textEditingController: _reviewNameController,
+              decoration: InputDecoration(
+                labelText: "Review Name",
+                contentPadding:  EdgeInsets.all(10),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.save_alt,color: Colors.white,),
+                label:  Text("Save Review",style: TextStyle(color: Colors.white),),
+                style: ElevatedButton.styleFrom(
+                   backgroundColor: primaryColor
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                  // Trigger Rerun
+                },
+              ),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+            ElevatedButton.icon(
+              icon: const Icon(Icons.refresh,color: Colors.white,),
+              label:  Text("Rerun review",style: TextStyle(color:Colors.white),),
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor
+                ),
+              onPressed: () {
+                final name = _reviewNameController.text.trim();
+                if (name.isEmpty) return;
+
+                Navigator.pop(context);
+              },
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.picture_as_pdf,color: Colors.white,),
+              label:  Text("Share as PDF",style: TextStyle(color:Colors.white)),
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor
+                ),
+              onPressed: () {
+                final name = _reviewNameController.text.trim();
+                if (name.isEmpty) return;
+
+                Navigator.pop(context);
+              },
+            ),
+    ]
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+

@@ -302,8 +302,8 @@ class _CodeTranspilerScreenState extends State<CodeTranspilerScreen> {
                             message: "Please enter some code.");
                         return;
                       }
-                      getit<codeTranspilerCubit>()
-                          .convertCode(sourceCode, _sourceLang, _targetLang!);
+                      context.read<codeTranspilerCubit>().convertCode(
+                      sourceCode, _sourceLang, _targetLang!);
                     },
                     style: ElevatedButton.styleFrom(
                         backgroundColor: primaryColor,

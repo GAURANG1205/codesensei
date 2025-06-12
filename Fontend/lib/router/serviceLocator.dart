@@ -8,5 +8,5 @@ final getit = GetIt.instance;
 Future<void> setupServiceLocator() async {
   getit.registerLazySingleton(()=>AppRouter());
   getit.registerLazySingleton(()=>AuthCubit());
-  getit.registerLazySingleton(()=>codeTranspilerCubit());
+  getit.registerFactory(()=>codeTranspilerCubit());
 }

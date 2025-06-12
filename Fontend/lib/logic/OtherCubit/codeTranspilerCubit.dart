@@ -20,14 +20,19 @@ class ConvertCodeFailure extends ConvertCodeState {
 class codeTranspilerCubit extends Cubit<ConvertCodeState> {
   codeTranspilerCubit() : super(ConvertCodeInitial());
 
-  final String geminiApiKey = 'AIzaSyDWIAIqPpOIYb0AbZi6uN9lLB022X0Kv3c';
+  final String geminiApiKey = 'AIzaSyCdZ9vph_8qmNP_WwmEVcWDbMtjx_akZps';
   final String groqApiKey = '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';
   final String deepseekApiKey = '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';
 
   Future<void> convertCode(String sourceCode, String sourceLang,
       String targetLang) async {
     emit(ConvertCodeLoading());
-
+    final lines = sourceCode.trim().split('\n');
+    final codeAfterFirstLine = lines.skip(1).join('\n').trim();
+    if (codeAfterFirstLine.isEmpty) {
+      emit(ConvertCodeFailure("Add some code "));
+      return;
+    }
     final prompt = """
   Convert the following code from $sourceLang to $targetLang:
 

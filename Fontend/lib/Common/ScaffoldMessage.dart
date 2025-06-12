@@ -14,8 +14,8 @@ class ScaffoldMessage{
       SnackBar(
         content: Text(
           message,
-          style: const TextStyle(
-            color: DarkModeColor,
+          style:  TextStyle(
+            color:  isError?Colors.white:DarkModeColor
           ),
         ),
         backgroundColor: isError ? Colors.redAccent : Colors.white,

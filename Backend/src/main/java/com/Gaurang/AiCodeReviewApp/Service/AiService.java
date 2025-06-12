@@ -46,7 +46,8 @@ public class AiService {
         String prompt = "Review the following code and provide issues and fixes in the following format:\n" +
                 "Type: <Error or Suggestion Only>\n" +
                 "Message: <explanation>\n" +
-                "Fix: <fix>\n" +
+                "Original: <the original code snippet that should be replaced>\n" +
+                "Fix: <fix the issue of Code>\n" +
                 "---\n" +
                 "At the end, give an overall rating from 1 to 5 in the format:\n" +
                 "Rating: <number from 1 to 5>\n" +
@@ -112,12 +113,15 @@ public class AiService {
             if (!part.trim().isEmpty()) {
                 String type = extractField(part, "Type:");
                 String message = extractField(part, "Message:");
+                String original = extractField(part, "Original:");
                 String fix = extractField(part, "Fix:");
 
-                if (type != null && message != null && fix != null) {
+                if (type != null && message != null && fix != null
+                &&original!=null) {
                     suggestions.add(Map.of(
                             "type", type.trim(),
                             "message", message.trim(),
+                            "original", original.trim(),
                             "fix", fix.trim()
                     ));
                 }
