@@ -22,25 +22,17 @@ class AuthCubit extends Cubit<AuthState> {
         body: jsonEncode({"email": email, "password": password}),
       )
           .timeout(const Duration(seconds: 5));
-
+      final data = jsonDecode(response.body);
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
         final token = data['token'];
         final username = data['username'];
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('authToken', token);
         await prefs.setString('username', username);
-        print("Login successful. Token stored.");
+        await prefs.setString('userId', data['userId'].toString());
         emit(AuthSuccess());
-      }
-        emit(AuthFailure("Login failed:"));
-      final errorMessage = response.body;
-      if (response.statusCode == 404 && errorMessage == "User not found") {
-        emit(AuthFailure("User not found"));
-      } else if (response.statusCode == 401 && errorMessage == "Invalid credentials") {
-        emit(AuthFailure("Incorrect password"));
-      } else {
-        emit(AuthFailure("Something went wrong"));
+      }else {
+        emit(AuthFailure("Login failed: ${data['error'] ?? 'Unknown error'}"));
       }
     } on TimeoutException catch (_) {
       emit(AuthFailure("Request timed out. Please try again."));
@@ -61,18 +53,18 @@ class AuthCubit extends Cubit<AuthState> {
           "username": username,
         }),
       ).timeout(const Duration(seconds: 5));
-
+      final data = jsonDecode(response.body);
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
         final token = data['token'];
         final username = data['username'];
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('username', username);
         await prefs.setString('authToken', token);
-
+        await prefs.setString('userId', data['userId'].toString());
         emit(AuthSuccess());
       } else {
-        emit(AuthFailure("Signup failed: ${response.body}"));
+        final errorData = jsonDecode(response.body);
+        emit(AuthFailure("Signup failed: ${errorData['message'] ?? 'Unknown error'}"));
       }
     }on TimeoutException catch(_){
       emit(AuthFailure("Request timed out. Please try again."));
@@ -103,21 +95,20 @@ class AuthCubit extends Cubit<AuthState> {
       final email = account.email;
       final name = account.displayName ?? "";
       final response = await http.post(
-        Uri.parse("http://192.168.0.112:8080/api/auth/google"),
+        Uri.parse("http://192.168.0.115:8080/api/auth/google"),
         body: {
           "email": email,
           "username": name,
         },
       ).timeout(const Duration(seconds: 5));
+      final data = jsonDecode(response.body);
       if (response.statusCode == 200) {
-        final token = response.body;
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('authToken', token);
-        await prefs.setString('username',name);
+        prefs.setString("authToken", data["token"]);
+        prefs.setString("userId", data["userId"].toString());
         emit(AuthSuccess());
-        print("Login successful. Token stored.");
       } else {
-        emit(AuthFailure("Signup failed: ${response.body}"));
+        emit(AuthFailure("Google SignIn Failed"));
       }
     } on TimeoutException catch(_){
       emit(AuthFailure("Request timed out. Please try again."));

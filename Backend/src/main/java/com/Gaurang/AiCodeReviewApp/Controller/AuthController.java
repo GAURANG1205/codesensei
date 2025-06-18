@@ -27,8 +27,8 @@ public class AuthController {
     }
 
     @PostMapping("/google")
-    public ResponseEntity<String> googleLogin(@RequestParam String email, @RequestParam String username) {
-        String token = authService.googleLogin(email, username);
-        return ResponseEntity.ok(token);
+    public ResponseEntity<AuthResponse> googleLogin(@RequestParam String email, @RequestParam String username) {
+        AuthResponse response= authService.googleLogin(email, username);
+        return ResponseEntity.ok(response);
     }
 }

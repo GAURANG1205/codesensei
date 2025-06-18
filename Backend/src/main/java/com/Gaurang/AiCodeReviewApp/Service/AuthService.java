@@ -36,7 +36,7 @@ public class AuthService {
         user.setProvider("Basic Auth");
         userRepository.save(user);
         String token = jwtUtil.generateToken(user.getEmail());
-        return new AuthResponse(token, user.getEmail(), user.getUsername(), "Basic Auth");
+        return new AuthResponse(token, user.getEmail(), user.getUsername(), "Basic Auth",user.getId());
 
     }
     public AuthResponse login(LoginRequestDTO request) {
@@ -46,10 +46,10 @@ public class AuthService {
             throw new RuntimeException("Invalid credentials");
         }
         String token = jwtUtil.generateToken(user.getEmail());
-        return new AuthResponse(token, user.getEmail(), user.getUsername(), "local");
+        return new AuthResponse(token, user.getEmail(), user.getUsername(), "local",user.getId());
     }
 
-    public String googleLogin(String email, String username) {
+    public AuthResponse  googleLogin(String email, String username) {
         User user = userRepository.findByEmail(email).orElse(null);
 
         if (user == null) {
@@ -60,7 +60,14 @@ public class AuthService {
             user.setProvider("Google");
             userRepository.save(user);
         }
-        return jwtUtil.generateToken(email);
+        String token = jwtUtil.generateToken(email);
+        return new AuthResponse(
+                token,
+                user.getEmail(),
+                user.getUsername(),
+                user.getProvider(),
+                user.getId()
+        );
     }
 }
 

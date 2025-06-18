@@ -262,11 +262,13 @@ class _CodePasteScreenState extends State<CodePasteScreen> {
                     if (isLoading)
                       const Center(child: CircularProgressIndicator(color: primaryColor,))
                     else if (aiSummary != null)
-                      Text(
-                        aiSummary!,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: isDarkMode ? Colors.white70 : Colors.black87,
+                      SingleChildScrollView(
+                        child: Text(
+                          aiSummary!,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: isDarkMode ? Colors.white70 : Colors.black87,
+                          ),
                         ),
                       )
                     else
@@ -283,7 +285,8 @@ class _CodePasteScreenState extends State<CodePasteScreen> {
                       child: ElevatedButton(
                         onPressed: () {
                           getit<AppRouter>().push(CodeReviewScreen(
-                              initialCode: _codeController.text.toString()));
+                              initialCode: _codeController.text.toString(),
+                          aiSummary:aiSummary??""));
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: primaryColor,
