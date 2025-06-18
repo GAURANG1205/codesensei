@@ -51,7 +51,6 @@ public class AuthService {
 
     public AuthResponse  googleLogin(String email, String username) {
         User user = userRepository.findByEmail(email).orElse(null);
-
         if (user == null) {
             user = new User();
             user.setEmail(email);
