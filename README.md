@@ -1,6 +1,6 @@
 # 🚀 CodeSensei – AI Code Review App
 
-AI-powered Flutter app to review, optimize, and transpile your code on the go.
+CodeSensei is an AI-powered Flutter app that reviews, optimizes, and transpiles code in real time using multiple AI APIs. It supports code uploads, intelligent feedback, and generates PDF reports — all in one place.
 
 ---
 
@@ -22,30 +22,33 @@ AI-powered Flutter app to review, optimize, and transpile your code on the go.
 - 🔄 Code Transpiler: Convert Code Between Languages
 - 🧾 Generate and Download Code Reports as PDF
 - 🔐 Google Sign-In Authentication
+- 📦 State Management with **Flutter BLoC & Cubit**
 
 ---
 
 ## 🛠️ Tech Stack
 
 **Frontend:** Flutter, Dart  
-**Backend:** Spring Boot
+**Backend:** Spring Boot  
 **Database:** MySQL  
-**Others:**  Gemini AI API,Groq AI API,Deepseek Ai API &  Railway (for deployment)
+**State Management:** Flutter BLoC, Cubit  
+**AI APIs:** Gemini AI, Groq AI, DeepSeek AI  
+**Deployment:** Railway
 
 ---
 
 ## 🧠 AI Integration
 
-- Uses **Gemini AI API** ,**Groq AI API** **Deepseek Ai API**for code analysis and review.
-- Automatically detects common bugs, anti-patterns, and recommends best practices.
-- Supports multi-language transpilation (e.g., Dart → JavaScript).
+- Integrated **Gemini AI**, **Groq AI**, and **DeepSeek AI** to analyze code structure and logic.
+- Detects bugs, anti-patterns, and suggests optimized or cleaner code.
+- Supports **multi-language transpilation** (e.g., Dart → JavaScript).
 
 ---
 
 ## 🚀 Deployment
 
-- **Frontend:** Didn'T Deployed
-- **Backend:** sparkling-flow-production.up.railway.app
+- **Frontend:** _Not yet deployed_  
+- **Backend:** [sparkling-flow-production.up.railway.app](https://sparkling-flow-production.up.railway.app)
 
 ---
 
@@ -60,6 +63,6 @@ cd codesensei/Frontend
 flutter pub get
 flutter run
 
-# Backend
+# Navigate to backend
 cd ../Backend
 ./mvnw spring-boot:run
