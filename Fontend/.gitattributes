@@ -1,0 +1,8 @@
+# Ignore all files in the native/ directory
+native/** linguist-vendored=true
+
+# Ignore all C++ files in the root
+*.cpp linguist-vendored=true
+*.c linguist-vendored=true
+*.cmake linguist-vendored=true
+*.h linguist-vendored=true
